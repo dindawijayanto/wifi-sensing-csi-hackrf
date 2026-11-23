@@ -70,7 +70,7 @@ Lihat `docs/pembagian_tugas.md` dan tab Task Tracker di Google Sheet [JARNIR].
 
 | Tim | Anggota |
 |---|---|
-| Rekam dan Hardware | Dinda Anggraini Wijayanto, Nafis Naufal Rahman, Priyambodo Arundaya Satmika, Micheline Keiza Andrea Pangemanan |
-| Pipeline CSI | Muhammad Zaid Robbani, Mayu Septania Anjani, Faruqi Akbar, Putri Aulia Sari |
-| Analisis dan Eksplorasi | Taqiya Sakha Putri, Marvin Ligarta, M. Farhan Zaky, Benedictus Giri Cahya Saputra |
-| Dokumen dan Presentasi | Faris Muhammad Mada Dziban, Rajwa Nadia Lathifa, Yoga Kurniawan, Bagas Aditha Pratama |
+| Rekam dan Hardware | Bagas Aditha Pratama, Yoga Kurniawan, Priyambodo Arundaya Satmika, Marvin Ligarta |
+| Pipeline CSI | Faruqi Akbar, Muhammad Zaid Robbani, Dinda Anggraini Wijayanto, M. Farhan Zaky |
+| Analisis dan Eksplorasi | Micheline Keiza Andrea Pangemanan, Nafis Naufal Rahman, Benedictus Giri Cahya Saputra, Taqiya Sakha Putri |
+| Dokumen dan Presentasi | Putri Aulia Sari, Mayu Septania Anjani, Rajwa Nadia Lathifa, Faris Muhammad Mada Dziban |
