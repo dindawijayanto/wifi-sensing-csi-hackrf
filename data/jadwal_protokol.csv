@@ -1,0 +1,5 @@
+skenario,deskripsi,durasi_s,sesi_minimal,posisi
+kosong,Ruang kosong (baseline); tidak ada orang di ruangan selama rekaman,60,3,-
+duduk_los,Satu orang duduk diam di garis LOS (titik tengah antara pemancar dan HackRF),60,3,titik D
+jalan_los,Satu orang berjalan bolak-balik memotong garis LOS mengikuti metronom,60,3,lintasan L1
+jalan_luar,Satu orang berjalan bolak-balik di luar LOS (dekat dinding),60,3,lintasan L2
