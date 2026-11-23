@@ -13,8 +13,8 @@ pengawas saat sesi rekaman.
 
 | Tim | Anggota | Tanggung jawab |
 |---|---|---|
-| T1 Rekam dan Hardware | Bagas, Yoga, Priyambodo, Marvin | HackRF, hotspot, uji OFDM/laju paket, sesi rekaman, log sesi, ekstraksi di lokasi |
-| T2 Pipeline CSI | Faruqi, Zaid, Dinda, Farhan | repo, csi_ekstrak, pemisahan pemancar, resampling, README, demo |
+| T1 Rekam dan Hardware | Bagas, Yoga, Marvin | HackRF, hotspot, laju paket, sesi rekaman, log sesi, ekstraksi di lokasi |
+| T2 Pipeline CSI | Faruqi, Zaid, Dinda, Farhan, Priyambodo | repo, csi_ekstrak, pemisahan pemancar, resampling, README, demo |
 | T3 Analisis dan Eksplorasi | Micheline, Nafis, Benedictus (Giri), Taqiya | desain eksperimen, heatmap, fitur, detektor, eksplorasi |
 | T4 Dokumen dan Presentasi | Putri, Mayu, Rajwa, Faris | proposal, kritik silang, persetujuan subjek, laporan, slide, submit |
 
