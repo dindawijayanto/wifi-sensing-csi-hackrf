@@ -1,76 +1,72 @@
 # Proposal Minggu 1: Case A, Deteksi Kehadiran dan Gerakan dengan CSI
 
-> Draf. Bagian bertanda **[ISI]** diisi setelah rekaman uji 24 Nov. Maksimal 2 halaman saat diekspor ke PDF.
+**Mata kuliah:** Jaringan Nirkabel · **Perangkat:** HackRF One (receive-only), hotspot HP, laptop Python 3 · **Lokasi:** kelas F4.12 FILKOM UB
 
 ## 1. Case yang dipilih dan alasannya
 
 Case A (Dasar, 20 paket/s, 2.4 atau 5 GHz). Alasan:
 
-- Laju paket 20 paket/s dapat dipenuhi hotspot HP dengan `ping`, sehingga risiko teknis rendah di
-  jadwal yang dipadatkan (minggu 1 dan 2 dalam 6 hari).
-- Pertanyaan utamanya langsung membandingkan CSI dengan RSSI, sesuai rubrik "ada pembanding RSSI".
-- Skenario tidak butuh banyak subjek atau pengulangan per subjek, jadi waktu bisa dipakai untuk eksplorasi.
+- **Risiko teknis rendah dan sudah terbukti:** rekaman uji kanal 6 memberi 3216 paket CSI rho > 0.6 dalam 10 s, penting karena minggu 1–2 dipadatkan ke 6 hari.
+- **Langsung membandingkan CSI dengan RSSI**, sesuai rubrik, dan dapat dijawab dengan angka (akurasi, FPR, FNR).
+- **Tidak butuh banyak subjek atau pengulangan per subjek**, sehingga waktu cukup untuk eksplorasi yang terukur.
 
 ## 2. Pertanyaan riset dan hipotesis
 
 **Pertanyaan:** apakah CSI dapat membedakan ruang kosong, orang diam, dan orang bergerak lebih baik daripada RSSI?
+Fitur per jendela 1 s: `csi_var_norm` = rata-rata 52 subcarrier dari var(|H[k]|)/mean(|H[k]|)²; pembanding `rssi_var` = variansi RSSI paket yang sama.
 
-- **H1.** Detektor ambang berbasis rata-rata variansi |H[k]| ternormalisasi (jendela 1 s) mencapai
-  akurasi >= 90% dengan FPR <= 10% untuk *kosong vs bergerak* pada skema leave-one-session-out.
-  *Terbantah jika* akurasi rata-rata < 90% atau FPR > 10%.
-- **H2.** Pada data uji yang sama, detektor berbasis variansi RSSI memiliki akurasi paling sedikit
-  10 poin persentase di bawah detektor CSI, terutama untuk skenario berjalan di luar LOS.
-  *Terbantah jika* selisih akurasi < 10 poin.
-- **H3.** Rata-rata fitur CSI skenario *duduk diam di LOS* berbeda dari *kosong* (uji Mann-Whitney, p < 0.05),
-  walaupun lebih kecil dari skenario berjalan. *Terbantah jika* p >= 0.05.
+- **H1.** Detektor ambang `csi_var_norm` mencapai akurasi ≥ 90% dan FPR ≤ 10% untuk *kosong vs bergerak* (jalan_los + jalan_luar_los) pada leave-one-session-out. *Terbantah jika* akurasi rata-rata < 90% atau FPR > 10%.
+- **H2.** Pada data uji yang sama, akurasi detektor `rssi_var` paling sedikit 10 poin persentase di bawah detektor CSI, terutama untuk berjalan di luar LOS. *Terbantah jika* selisihnya < 10 poin.
+- **H3.** Median `csi_var_norm` *duduk diam di LOS* lebih besar daripada *kosong* (Mann-Whitney satu sisi, p < 0.05), walaupun lebih kecil dari skenario berjalan. *Terbantah jika* p ≥ 0.05.
 
 ## 3. Desain eksperimen
 
+<div class="denah"><img src="denah_f412.png" alt="Denah kelas F4.12 dengan titik uji"><p><b>Gambar 1.</b> Denah kelas F4.12. <b>TX</b> hotspot HP di ujung depan lorong antarblok meja, <b>RX</b> HackRF + laptop di ujung belakang lorong yang sama; LOS ±4 m, tinggi alat ±1 m. <b>D</b> titik duduk di tengah LOS. <b>L1</b> (A1↔B1) memotong LOS di sela baris meja 2 dan 3. <b>L2</b> (A2↔B2) sejajar LOS di lorong sisi kaca, ±1,5 m dari LOS. Semua titik ditandai lakban dan difoto.</p></div>
+
 | Item | Rencana |
 |---|---|
-| Denah | Pemancar (hotspot HP) dan HackRF setinggi sekitar 1 m, terpisah 4 m. Titik D di tengah LOS, lintasan L1 memotong LOS, lintasan L2 sejajar dinding sekitar 1.5 m dari LOS. Semua posisi ditandai lakban. **[ISI denah + foto]** |
-| Skenario | kosong, duduk_los, jalan_los, jalan_luar |
-| Sesi | 3 sesi per skenario, 60 s per sesi (minimal case: 3 x 30 s) |
-| Subjek | 3 subjek (P1-P3) bergantian per sesi, kode anonim |
-| Kanal | **[ISI]** 2.4 GHz kanal 6 bila frame OFDM terbukti (rho > 0.6), selain itu 5 GHz kanal 36 |
-| Gain | `-l 40 -g 26 -a 0`, dikunci untuk semua sesi (disesuaikan jika rekaman uji menunjukkan clipping) |
-| Pemancar | Hotspot HP milik kelompok, kanal dikunci; laptop menjalankan `ping -i 0.01` |
-| Laju paket | Target >= 50 paket/s (2.5x kebutuhan 20 paket/s). Terukur pada uji: **[ISI] paket/s** |
-| Kontrol | Tidak ada orang lain di ruangan saat baseline, pintu tertutup, kondisi dicatat di `log_sesi.csv` |
+| Skenario | `kosong` (baseline), `duduk_los` (D), `jalan_los` (L1 bolak-balik), `jalan_luar_los` (L2 bolak-balik) |
+| Sesi | 4 skenario × 3 sesi, masing-masing ≥ 30 s (minimal case base). Putaran 1 sudah direkam: 12 sesi, 28–31 s |
+| Subjek | Putaran 1: P1 untuk semua sesi; bila waktu cukup, putaran 2 dengan P2 dan P3. Kode anonim, persetujuan tertulis |
+| Kanal | **2.4 GHz kanal 6 (2437 MHz)**, hotspot 802.11n; frame OFDM terbukti memberi CSI (rho > 0.6). Cadangan: 5 GHz kanal 36 |
+| Gain | `-l 40 -g 26 -a 0`, dikunci dan dicatat di `log_sesi.csv`. Daya L-LTF umumnya −1 sampai 0 dBFS (dekat batas ADC 8-bit): sebelum rekaman lanjutan, clipping di `cek_rekaman.py` harus < 0.01%, bila tidak laptop dijauhkan atau gain diturunkan (`-l 32`) |
+| Pemancar | Hotspot Xiaomi 13T milik kelompok, kanal dikunci. Trafik: `ping -i 0.01` (WSL) atau `kode/trafik.py` (Windows). Paket HP dipisah dari paket laptop dengan RSSI (selisih ±12 dB) dan durasi burst; CFO keduanya sama (sekitar −9 kHz) sehingga tidak dipakai |
+| Laju paket | Butuh 20 paket/s, target ≥ 50. Terukur: ping **92.4 paket/s** (interval 10 ms, 0% loss); rekaman uji ±103 paket CSI/s setelah filter; sesi putaran 1: 120–214 paket/s, celah terpanjang 0.9–1.9 s, jadi jendela < 5 paket dibuang (95.8% jendela tetap terpakai) |
+| Kontrol | Tidak ada orang lain saat baseline, pintu tertutup, kondisi dan jam mulai dicatat di `log_sesi.csv` |
 
 ## 4. Metrik keberhasilan
 
-- Akurasi, FPR, dan FNR detektor kosong vs bergerak pada data uji yang tidak dipakai menentukan ambang.
-- Rasio median fitur CSI bergerak/kosong dan RSSI bergerak/kosong.
-- Laju paket aktual dan celah terpanjang per sesi.
+| Metrik | Target |
+|---|---|
+| Akurasi detektor CSI kosong vs bergerak, pada data uji yang tidak dipakai menentukan ambang | ≥ 90% |
+| False positive rate / false negative rate | ≤ 10% / ≤ 10% |
+| Selisih akurasi CSI − RSSI pada data uji yang sama | ≥ 10 poin persentase |
+| Rasio median fitur bergerak/kosong | rasio `csi_var_norm` > rasio `rssi_var` |
+| Kualitas data per sesi | ≥ 20 paket/s setelah filter, ≥ 90% jendela berisi ≥ 5 paket, clipping < 0.01% |
 
 ## 5. Skema pembagian data latih dan uji
 
-Leave-one-session-out: ambang dipilih dari 2 sesi, diuji di sesi ke-3, diulang 3 kali. Jendela dari sesi
-yang sama tidak pernah dipecah ke latih dan uji. Bila subjek berbeda per sesi, skema ini sekaligus menguji
-perpindahan subjek.
+Leave-one-session-out: ambang (CSI dan RSSI, cara yang sama) dipilih hanya dari 2 sesi dengan memaksimalkan balanced accuracy, diuji di sesi ke-3, diulang 3 kali, dilaporkan rata-rata ± simpangan baku. Jendela satu sesi tidak pernah dipecah ke latih dan uji. Jika data P2 dan P3 tersedia, ditambah leave-one-person-out.
 
 ## 6. Gagasan eksplorasi
 
-**Batas laju paket untuk beacon AP.** Data hotspot di-*downsample* bertahap (50, 20, 10, 5 paket/s) untuk
-mencari laju terendah yang masih memberi akurasi >= 90%, lalu dibandingkan dengan beacon AP (sekitar 9.77 paket/s).
-Cadangan jika waktu cukup: menghitung orang (0-3 orang bergerak) untuk melihat apakah fitur CSI naik secara monoton.
+**Batas laju paket untuk beacon AP.** Data hotspot ditipiskan ke grid teratur 50, 20, 10, 5 paket/s (`eksplorasi_laju.py`) lalu detektor dievaluasi ulang dengan leave-one-session-out, dibandingkan dengan laju beacon AP (±9.77 paket/s). *Hipotesis:* akurasi tetap ≥ 90% pada 10 paket/s. *Terbantah jika* < 90%. Cadangan: menghitung orang (0–3 orang bergerak), apakah fitur CSI naik monoton (korelasi Spearman, `hitung_orang.py`).
 
 ## 7. Tanggapan atas kritik kelompok lain
 
 | Kritik/saran | Tanggapan dan bagian yang diubah |
 |---|---|
-| **[ISI]** | |
-| **[ISI]** | |
+| **[ISI kritik 1]** | |
+| **[ISI kritik 2]** | |
 | **[ISI saran]** | |
 
 ## 8. Pembagian tugas anggota
 
-Lihat `docs/pembagian_tugas.md` dan tab Task Tracker di Google Sheet [JARNIR].
+Rincian di `docs/pembagian_tugas.md`. Semua anggota bergantian menjadi subjek atau pengawas.
 
-| Tim | Anggota |
-|---|---|
-| Rekam dan Hardware | Bagas Aditha Pratama, Yoga Kurniawan, Marvin Ligarta, M. Farhan Zaky |
-| Pipeline CSI | Faruqi Akbar, Muhammad Zaid Robbani, Dinda Anggraini Wijayanto, Priyambodo Arundaya Satmika |
-| Analisis dan Eksplorasi | Micheline Keiza Andrea Pangemanan, Nafis Naufal Rahman, Benedictus Giri Cahya Saputra, Taqiya Sakha Putri |
-| Dokumen dan Presentasi | Putri Aulia Sari, Mayu Septania Anjani, Rajwa Nadia Lathifa, Faris Muhammad Mada Dziban |
+| Tim | Anggota | Tugas utama |
+|---|---|---|
+| Rekam dan Hardware | Bagas, Yoga, Marvin, Farhan | HackRF, hotspot, laju paket, pemisahan pemancar, sesi rekaman, log |
+| Pipeline CSI | Faruqi, Zaid, Dinda, Priyambodo | ekstraksi dan validasi CSI, resampling, README, demo |
+| Analisis dan Eksplorasi | Micheline, Nafis, Giri, Taqiya | desain eksperimen, heatmap, fitur, detektor, eksplorasi |
+| Dokumen dan Presentasi | Putri, Mayu, Rajwa, Faris | proposal, kritik silang, persetujuan subjek, laporan, slide |
